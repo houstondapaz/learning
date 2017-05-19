@@ -56,4 +56,8 @@ export default {
 .painel-fade-leave-active {
     opacity: opacity 2s;
 }
+
+.painel-conteudo{
+    overflow: hidden;
+}
 </style>

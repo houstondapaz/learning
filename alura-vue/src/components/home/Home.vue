@@ -1,18 +1,13 @@
 <template>
     <div>
         <h1 class="centralizado">{{titulo}}</h1>
+        <p v-show="mensagem">{{mensagem}}</p>
         <input type="search" class="filtro" @input="filtro = $event.target.value" placeholder="digita aqui">
         <ul class="lista-fotos">
             <li class="lista-fotos-item" v-for="foto in fotosComFiltro">
                 <meu-painel :titulo="foto.titulo">
-                    <imagem-responsiva :url="foto.url" :titulo="foto.titulo" />
-                    <meu-botao 
-                        tipo="button" 
-                        rotulo="REMOVER"
-                        estilo="perigo"
-                        :confirmacao="true"
-                        @botaoAtivado="remove($event, foto)" 
-                    />
+                    <imagem-responsiva :url="foto.url" :titulo="foto.titulo" v-meu-transform:scale.animate="1.1" />
+                    <meu-botao tipo="button" rotulo="REMOVER" estilo="perigo" :confirmacao="true" @botaoAtivado="remove($event, foto)" />
                 </meu-painel>
             </li>
         </ul>
@@ -22,7 +17,9 @@
 <script>
 import Painel from '../shared/painel/Painel.vue';
 import Botao from '../shared/botao/Botao.vue';
+import TransformDirective from '../../directives/Transform';
 import ImagemResponsiva from '../shared/imagem-responsiva/ImagemResponsiva.vue';
+import FotoService from '../../domain/foto/FotoService';
 
 export default {
     components: {
@@ -31,8 +28,13 @@ export default {
         'imagem-responsiva': ImagemResponsiva
     },
 
+    directives: {
+        'meu-transform': TransformDirective
+    },
+
     data() {
         return {
+            mensagem: '',
             titulo: 'Fotos ZIcas',
             fotos: [],
             filtro: ''
@@ -51,14 +53,22 @@ export default {
 
     methods: {
         remove(e, foto) {
-            console.log(e);
-            alert(`Remove foto ${foto.titulo}`);
+            this.fotoService.apaga(foto._id)
+                .then(() => {
+                    this.fotos = this.fotos.filter(f => f._id != foto._id);
+                    this.mensagem = "foto removida com sucesso";
+                },
+                err => {
+                    console.log(err);
+                    this.mensagem = "Não foi possivel remover a foto";
+                })
         }
     },
 
     created() {
-        this.$http.get('http://localhost:3000/v1/fotos')
-            .then(res => res.json())
+        this.fotoService = new FotoService(this.$resource);
+        this.fotoService
+            .list()
             .then(fotos => this.fotos = fotos);
     }
 }
