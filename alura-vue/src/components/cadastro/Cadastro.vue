@@ -65,7 +65,7 @@ export default {
 									this.$router.push({ name: 'home' });
 								else
 									this.foto = new Foto();
-							}, err => console.err(err));
+							}, err => console.error(err));
 					}
 				});
 		}
