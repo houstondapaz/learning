@@ -9,7 +9,7 @@ module.exports = () => {
 	app.use(express.static('./app/public'));
 	app.set('view engine', 'ejs');
 	app.set('views', './app/views');
-
+	app.set('x-powered-by', false)
 	app.use(bodyParser.urlencoded({ extended: true }));
 	app.use(bodyParser.json());
 	app.use(validator());
